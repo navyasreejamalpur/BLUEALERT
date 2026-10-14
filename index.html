@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        BlueAlert | Marine Plastic Intelligence
+    </title>
+
+
+    <!-- Leaflet -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div>
+
+        <h1>
+            🌊 BlueAlert
+        </h1>
+
+        <p>
+            AI-Assisted Marine Plastic Intelligence
+        </p>
+
+    </div>
+
+    <div class="status">
+
+        <span class="status-dot"></span>
+
+        SYSTEM ONLINE
+
+    </div>
+
+</header>
+
+
+<main>
+
+
+<section class="hero">
+
+    <div>
+
+        <span class="tag">
+            CLIMATE & OCEAN INTELLIGENCE
+        </span>
+
+        <h2>
+            Detect. Map. Predict.
+        </h2>
+
+        <p>
+
+            Upload a satellite or drone image
+            to detect floating marine plastic,
+            map detected debris and estimate
+            its possible movement.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     ANALYSIS INPUT
+========================================= -->
+
+
+<section class="panel">
+
+    <div class="section-title">
+
+        <div>
+
+            <h2>
+                01 · Image Analysis
+            </h2>
+
+            <p>
+                Upload a satellite or drone image.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form
+        id="analysisForm"
+        class="analysis-form"
+    >
+
+
+        <label>
+
+            Satellite / Drone Image
+
+            <input
+                id="satelliteImage"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.tif,.tiff"
+                required
+            >
+
+        </label>
+
+
+        <label>
+
+            Image Date
+
+            <input
+                id="imageDate"
+                type="date"
+                required
+            >
+
+        </label>
+
+
+        <label>
+
+            Center Latitude
+
+            <input
+                id="imageLatitude"
+                type="number"
+                step="any"
+                value="17.65"
+                required
+            >
+
+        </label>
+
+
+        <label>
+
+            Center Longitude
+
+            <input
+                id="imageLongitude"
+                type="number"
+                step="any"
+                value="83.45"
+                required
+            >
+
+        </label>
+
+
+        <label>
+
+            Image Width
+
+        <input type="number" id="footprintWidth" value="1" min="0.1" step="0.1">
+
+<input type="number" id="footprintHeight" value="1" min="0.1" step="0.1"> 
+
+            <small>
+                Approx. km
+            </small>
+
+        </label>
+
+
+        <label>
+
+            Image Height
+
+            <input
+                id="footprintHeight"
+                type="number"
+                value="5"
+                min="0.1"
+                step="0.1"
+            >
+
+            <small>
+                Approx. km
+            </small>
+
+        </label>
+
+
+        <button
+            id="analyzeButton"
+            type="submit"
+            class="primary-button"
+        >
+
+            🔍 Analyze Marine Image
+
+        </button>
+
+
+    </form>
+
+
+    <div
+        id="analysisStatus"
+        class="status-message"
+    >
+        Ready for analysis.
+    </div>
+
+
+    <div
+        id="imagePreviewBox"
+        class="image-preview-box hidden"
+    >
+
+        <img
+            id="uploadedImage"
+            alt="Uploaded satellite image"
+        >
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     DASHBOARD
+========================================= -->
+
+
+<section class="panel">
+
+    <div class="section-title">
+
+        <div>
+
+            <h2>
+                02 · Debris Intelligence
+            </h2>
+
+            <p>
+                Results generated from the AI detector.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="dashboard">
+
+
+        <div class="metric">
+
+            <span>
+                Detected Debris
+            </span>
+
+            <strong id="metricDetected">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span>
+                Plastic Patches
+            </span>
+
+            <strong id="metricPatches">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span>
+                Estimated Area
+            </span>
+
+            <strong id="metricArea">
+                0 m²
+            </strong>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span>
+                Density
+            </span>
+
+            <strong id="metricDensity">
+                0 / km²
+            </strong>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span>
+                AI Confidence
+            </span>
+
+            <strong id="metricConfidence">
+                0%
+            </strong>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span>
+                Priority
+            </span>
+
+            <strong id="metricPriority">
+                —
+            </strong>
+
+        </div>
+
+
+        <div class="metric wide">
+
+            <span>
+                Image Center
+            </span>
+
+            <strong id="metricCoordinates">
+                —
+            </strong>
+
+        </div>
+
+
+        <div class="metric wide">
+
+            <span>
+                Analysis Time
+            </span>
+
+            <strong id="metricTimestamp">
+                —
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="detectionList"
+        class="detection-list"
+    >
+
+        No analysis performed yet.
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     MAP
+========================================= -->
+
+
+<section class="panel">
+
+    <div class="section-title">
+
+        <div>
+
+            <h2>
+                03 · Marine Debris Map
+            </h2>
+
+            <p>
+                Detected debris is converted to GeoJSON
+                and displayed geographically.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="legend">
+
+        <span>
+            <i class="dot high"></i>
+            High Priority
+        </span>
+
+        <span>
+            <i class="dot medium"></i>
+            Medium Priority
+        </span>
+
+        <span>
+            <i class="dot low"></i>
+            Low Priority
+        </span>
+
+        <span>
+            <i class="dot drift"></i>
+            Drift Path
+        </span>
+
+    </div>
+
+
+    <div id="map"></div>
+
+
+    <div class="map-actions">
+
+        <button
+            id="downloadGeoJSON"
+            class="secondary-button"
+        >
+            ⬇ Download GeoJSON
+        </button>
+
+        <button
+            id="clearMap"
+            class="secondary-button"
+        >
+            Clear Analysis
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     DRIFT
+========================================= -->
+
+
+<section class="panel">
+
+    <div class="section-title">
+
+        <div>
+
+            <h2>
+                04 · Indicative Drift Simulation
+            </h2>
+
+            <p>
+                Prototype movement estimate using
+                user-provided wind and current values.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="drift-grid">
+
+
+        <label>
+
+            Wind Speed
+
+            <input
+                id="windSpeed"
+                type="number"
+                value="10"
+                min="0"
+                step="0.1"
+            >
+
+            <small>
+                km/h
+            </small>
+
+        </label>
+
+
+        <label>
+
+            Wind Direction
+
+            <input
+                id="windDirection"
+                type="number"
+                value="90"
+                min="0"
+                max="359"
+            >
+
+            <small>
+                degrees
+            </small>
+
+        </label>
+
+
+        <label>
+
+            Ocean Current Speed
+
+            <input
+                id="currentSpeed"
+                type="number"
+                value="2"
+                min="0"
+                step="0.1"
+            >
+
+            <small>
+                km/h
+            </small>
+
+        </label>
+
+
+        <label>
+
+            Current Direction
+
+            <input
+                id="currentDirection"
+                type="number"
+                value="90"
+                min="0"
+                max="359"
+            >
+
+            <small>
+                degrees
+            </small>
+
+        </label>
+
+
+        <label>
+
+            Simulation Hours
+
+            <input
+                id="driftHours"
+                type="number"
+                value="24"
+                min="1"
+                max="168"
+            >
+
+            <small>
+                hours
+            </small>
+
+        </label>
+
+
+        <button
+            id="driftButton"
+            class="primary-button"
+        >
+
+            🌊 Simulate Drift
+
+        </button>
+
+    </div>
+
+
+    <div
+        id="driftStatus"
+        class="status-message"
+    >
+        Waiting for debris analysis.
+
+    </div>
+
+    <div class="scientific-note">
+
+        ⚠️ Prototype simulation only.
+        It is not a validated ocean forecast,
+        navigation prediction or scientific measurement.
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     GEOJSON PREVIEW
+========================================= -->
+
+
+<section class="panel">
+
+    <h2>
+        05 · GeoJSON Output
+    </h2>
+
+    <pre id="geojsonOutput">
+No GeoJSON generated yet.
+    </pre>
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    BlueAlert · AI-Assisted Marine Plastic Monitoring
+
+</footer>
+
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+
+<script src="/app.js"></script>
+
+
+</body>
+
+</html>
